@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "redirect"
 version = "0.1.0"
-description = "Shorten url redirect service"
+description = "Redirect service"
 authors = ["DipCoy <dipolarcoyote@gmail.com>"]
 
 [tool.poetry.dependencies]
