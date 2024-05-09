@@ -12,11 +12,13 @@ services:
         soft: 4096
         hard: 4096
     restart: always
-    logging:
-      driver: journald
     env_file:
       - .env
     command: bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: ${LOG_DRIVER_ADDRESS}
 
   nginx:
     container_name: redirect_nginx
@@ -30,7 +32,9 @@ services:
     volumes:
       - nginx_log_volume:/var/log/nginx
     logging:
-      driver: journald
+      driver: fluentd
+      options:
+        fluentd-address: ${LOG_DRIVER_ADDRESS}
 
 
 volumes:

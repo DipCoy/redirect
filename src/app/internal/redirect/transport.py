@@ -7,6 +7,7 @@ from config import settings
 from config.settings import storage
 
 redirect_router = APIRouter(prefix="", tags=["redirect"])
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
