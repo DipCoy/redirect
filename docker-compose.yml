@@ -12,13 +12,18 @@ services:
         soft: 4096
         hard: 4096
     restart: always
+    depends_on:
+      - fluent-bit
     env_file:
       - .env
     command: bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000"
     logging:
       driver: fluentd
       options:
-        fluentd-address: ${LOG_DRIVER_ADDRESS}
+        fluentd-address: "10.5.0.2:24224"
+    networks:
+      net:
+        ipv4_address: 10.5.0.4
 
   nginx:
     container_name: redirect_nginx
@@ -29,13 +34,42 @@ services:
       - ${PORT}:80
     depends_on:
       - app
+      - fluent-bit
     volumes:
       - nginx_log_volume:/var/log/nginx
     logging:
       driver: fluentd
       options:
-        fluentd-address: ${LOG_DRIVER_ADDRESS}
+        fluentd-address: "10.5.0.2:24224"
+    networks:
+      net:
+        ipv4_address: 10.5.0.3
+
+  fluent-bit:
+    container_name: redirect_fluent-bit
+    image: fluent-bit
+    build:
+      context: fluentbit
+    command:
+      - /fluent-bit/bin/fluent-bit
+      - --config=/etc/fluent-bit/fluent-bit.conf
+    env_file:
+      - .env
+    logging:
+      driver: journald
+
+    networks:
+      net:
+        ipv4_address: 10.5.0.2
 
 
 volumes:
   nginx_log_volume:
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
